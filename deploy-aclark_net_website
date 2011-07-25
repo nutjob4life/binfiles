@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd /srv/aclark_net_website
+bin/plone stop
+cd /srv/staging
+bin/deploy-filestorage
+bin/deploy-blobstorage
+cd /srv/aclark_net_website
+bin/plone start
