@@ -7,3 +7,4 @@ bin/deploy-filestorage
 bin/deploy-blobstorage
 cd /srv/aclark_net_website
 bin/plone start
+echo 'Done!'
