@@ -1,10 +1,19 @@
 #!/bin/sh
 
+# Change directory to production site
 cd /srv/aclark_net_website
+
+# Stop production site
 bin/plone stop
+
+# Change Directory to staging site
 cd /srv/staging
+
+# Sync staging db to production
 bin/deploy-filestorage
 bin/deploy-blobstorage
+
+# Finish up
 cd /srv/aclark_net_website
 bin/plone start
 echo 'Done!'
