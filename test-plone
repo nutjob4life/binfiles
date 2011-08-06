@@ -1,7 +1,7 @@
 #!/bin/sh
 
 mkdir $1
-virtualenv $1
+virtualenv-2.6 $1
 cd $1
 bin/easy_install zc.buildout
 bin/buildout init
