@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+# FUNCTION: GetRandNum()
+# ---------------------------------------------------------
+sub GetRandNum() {
+	my $lower=33;
+	my $upper=126;
+
+	my $random = int(rand( $upper-$lower+1 )) + $lower;
+
+	return $random;
+}
+# ---------------------------------------------------------
+
+# SUB: DisplayUsage()
+# ---------------------------------------------------------
+sub DisplayUsage() {
+	print "\nUsage: genpass [-OPTIONS] LENGTH\n";
+	print "Generate a secure password LENGTH characters long.\n\n";	
+	print "\t-s, --symbols\t\tExclude symbol characters.\n";
+	print "\t-n, --numbers\t\tExclude number characters.\n";
+	print "\t-u, --uppercase\t\tExclude uppercase characters.\n";
+	print "\t-l, --lowercase\t\tExclude lowercase characters.\n\n";
+	print "\t--help\t\t\tDisplay this usage screen.\n\n";
+	print "Report bugs, comments, and questions to jbrown_home\@yahoo.ca\n\n";
+}
+# ---------------------------------------------------------
+
+# DECLARE OPTION FLAGS
+# ---------------------------------------------------------
+my $symbols='0';		# all self-explanatory
+my $numbers='0';
+my $uppercase='0';
+my $lowercase='0';
+my $help='0';
+
+# PARSE AND SET COMMAND-LINE OPTIONS
+# ---------------------------------------------------------
+GetOptions( 's|S|symbols' => \$symbols,
+	    'n|N|numbers' => \$numbers,
+	    'u|U|uppercase' => \$uppercase,
+	    'l|L|lowercase' => \$lowercase,
+	    'help' => \$help, );
+
+
+## START ERROR CHECKING HERE
+# ---------------------------------------------------------
+my $kill='0';	# flag to stop the script if input is invalid (or --help is used)
+my $errcount=0;	# count error messages	
+my @errmsg;	# error message array
+
+# Check for --help option, run DisplayUsage(), kill script
+# (This is not really an error, but I put it here because of the $kill flag)
+# ---------------------------------------------------------
+if ($help eq '1') {
+	DisplayUsage();
+	$kill='1';		
+}
+
+# Check that user hasn't excluded all character-types, warn user, kill script
+# ---------------------------------------------------------
+if (($symbols eq '1') && ($numbers eq '1') && ($uppercase eq '1') && ($lowercase eq '1')) {
+	$errmsg[$errcount]="\ngenpass ERROR: At least 1 character-type must be included";	
+	$kill='1';
+	$errcount++;
+}
+
+# Check that user has passed only 1 argument (LENGTH), warn user, kill script
+# ---------------------------------------------------------
+if ($#ARGV > 0 || $#ARGV < 0) {
+	$errmsg[$errcount]="\ngenpass ERROR: Incorrect number of arguments passed";
+	$kill='1';
+	$errcount++;
+}
+# Check for only numeric input in LENGTH argument, warn user, kill script
+# ---------------------------------------------------------
+else { 
+	if($ARGV[0] !~ /^[0-9]+$/) {
+		$errmsg[$errcount]="\ngenpass ERROR: Invalid input. LENGTH argument must be a numeric value";
+		$kill='1';
+		$errcount++;
+	}
+}
+
+# If any of the above tests triggered the $kill flag, display errors and kill script
+# ---------------------------------------------------------
+if ($kill eq '1' && $help eq '1') {		# If triggered by the --help option
+	exit();
+}
+elsif ($kill eq '1') {				 # If triggered by an error
+	print "\n".$errcount." Error(s) found";  # show number of errors	
+	foreach my $err (@errmsg) {		 # display error messages
+		print $err;
+	}
+	print "\nType genpass --help for command usage\n\n";
+	exit();					 # exit script
+}
+# ---------------------------------------------------------
+## END ERROR CHECKING HERE
+
+
+## SCRIPT WITH VALID INPUT STARTS HERE
+# ---------------------------------------------------------
+my $pwdlen=$ARGV[0];	# password length
+my $count=0;		# a counter
+my $password="";	# string to hold the password
+my $isgood=0;		# validity flag
+my $num=0;		# will hold random numbers
+
+# loop until our password is the desired length
+	while ($count < $pwdlen) {
+
+		$isgood=0;		# reset the isgood flag
+		$num=GetRandNum();	# get a random number
+
+	# test the random number to see if it is a valid character
+	# and change the isgood flag if it hasn't been excluded by the user...
+
+		if (($num >= 33 && $num <= 47) || ($num >= 58 && $num <= 64) || ($num >= 91 && $num <= 95) || ($num >= 123 && $num <= 126)) {
+			if ($symbols eq '0') {	# symbols		
+				$isgood=1;	
+			}
+		} elsif (($num >= 48 && $num <= 57)) {
+			if ($numbers eq '0') {	# numbers
+				$isgood=1;	
+			}
+		} elsif (($num >= 65 && $num <= 90)) {
+			if ($uppercase eq '0') { # uppercase	
+				$isgood=1;	
+			}
+		} elsif (($num >= 97 && $num <= 122)) {
+			if ($lowercase eq '0') { # lowercase
+				$isgood=1;	
+			}
+		}
+		else {
+			; #do nothing
+		}
+	# test the isgood flag, and if the character is good
+		if ($isgood == 1) {
+			$password=$password.chr($num); 	# append the character to the password string
+			$count++;			# increment the count
+		}
+	# or else do nothing, and loop again...
+	
+	}
+
+# print the finished password to the screen
+	print $password."\n";
+
+# ---------------------------------------------------------
+## SCRIPT ENDS HERE
+__END__
+

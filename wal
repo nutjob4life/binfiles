@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# alteration of script described at
+# http://www.linux.com/article.pl?sid=07/03/06/1640216
+# changes from original:
+# 1. use of VISUAL envariable for editor
+# 2. storage of password in variable, rather than file
+# 3. view-only mode (rather than always opening in text editor)
+# 4. symmetric encryption
+# 5. saving backup copy of encrypted password file prior to editing
+# 6. creates password wallet if it doesn't exist
+# 7. encrypted file can be specified by -c option, by PASSWD_LIST
+#    envariable, or in ~/.walletrc
+
+if [ -f ~/.walletrc ]; then
+. ~/.walletrc
+fi
+
+if [ -z ${VISUAL} ]; then
+VISUAL=vi
+fi
+
+EDIT_PWFILE=0
+while getopts 'ec:' OPTION
+do
+case $OPTION in
+e) EDIT_PWFILE=1;;
+c) PASSWD_LIST="$OPTARG";;
+?) printf "usage: %s [ -e ] [ -c encrypted file ]\n" $( basename $0 ) >&2
+ exit 2
+ ;;
+esac
+done
+shift $(($OPTIND - 1))
+
+if [ -z "${PASSWD_LIST}" ]; then
+echo "need the encrypted file specified by PASSWD_LIST (in ~/.walletrc"
+echo "or the envariable) or with the -c option"
+exit 2
+fi
+
+if [ ! -f $PASSWD_LIST ]; then
+echo "$PASSWD_LIST doesn't exist--attempting to create..."
+echo "(you'll need to give gpg a master password in a moment)"
+mkdir -p $( dirname ${PASSWD_LIST} )
+TEMPFILE=$( mktemp /tmp/wallet.XXXXXX )
+gpg -c -o ${PASSWD_LIST} ${TEMPFILE}
+rm -f ${TEMPFILE}
+EDIT_PWFILE=1
+fi
+
+# prompt the user for the password
+PASSWORD=$( dialog --stdout --backtitle "Password Locker" \
+--title "Master Password" --clear --passwordbox \
+"Enter the Password Locker master password." 10 51 )
+RETVAL=$?
+
+case $RETVAL in
+1)
+  echo "Authentication Required!"
+  exit 1;;
+255)
+  echo "Authentication Required!"
+  exit 1;;
+esac
+
+# if we're not editing the file, just display it and quit
+if [ $EDIT_PWFILE -eq 0 ]; then
+echo $PASSWORD | gpg --decrypt --passphrase-fd 0 $PASSWD_LIST | less
+clear
+exit
+fi
+
+TMPDIR=$( mktemp -d /tmp/wallet.XXXXXX )
+chmod 700 ${TMPDIR}
+PASSWD_LIST_UNENCRYPTED=${TMPDIR}/wallet
+# decrypt the password list
+echo $PASSWORD | gpg -o $PASSWD_LIST_UNENCRYPTED --passphrase-fd 0 \
+$PASSWD_LIST &> /dev/null
+RETVAL=$?
+
+# if decryption succeeded, open the password list in the editor
+# and then re-encrypt it after the editor closes
+case $RETVAL in
+0)
+  mv $PASSWD_LIST ${PASSWD_LIST}.bak
+  ${VISUAL} $PASSWD_LIST_UNENCRYPTED 2> /dev/null;
+  echo $PASSWORD | gpg -c -o $PASSWD_LIST --passphrase-fd 0 \
+      $PASSWD_LIST_UNENCRYPTED &> /dev/null
+  CRYPT_RETVAL=$?
+  if [ $CRYPT_RETVAL -eq 0 ]; then
+      rm -rf ${TMPDIR}
+      clear
+  else
+      echo -n "gpg failed to encrypt your password file! "
+      echo "Please fix the problem manually!"
+      echo "unencrypted file at $PASSWD_LIST_UNENCRYPTED"
+      exit 1
+  fi;;
+?)
+  echo "error condition detected (invalid password?)"
+  rm -rf ${TMPDIR}
+  exit 1;;
+esac
