@@ -7,7 +7,7 @@ bin/easy_install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://dist.aclark.net/build/plone/4.1.x/develop.cfg
+extends = http://x.aclark.net/plone/4.1.x/develop.cfg
 EOF
 bin/buildout
 bin/plone fg
