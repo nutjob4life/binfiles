@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir $1
+virtualenv-2.6 $1
+cd $1
+bin/easy_install zc.buildout
+bin/buildout init
+cat << EOF > buildout.cfg
+[buildout]
+extends = http://x.aclark.net/zope2/2.13.x/develop.cfg
+EOF
+bin/buildout
