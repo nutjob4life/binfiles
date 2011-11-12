@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir $1
+cd $1
+vagrant init
+vagrant up
+vagrant ssh
