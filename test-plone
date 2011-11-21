@@ -10,4 +10,4 @@ cat << EOF > buildout.cfg
 extends = http://x.aclark.net/plone/4.2.x/develop.cfg
 EOF
 bin/buildout
-bin/plone fg
+bin/paster serve plone.ini
