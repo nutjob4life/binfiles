@@ -7,7 +7,7 @@ bin/pip install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://build.pythonpackages.com/buildout/apache/2.2.x/buildout.cfg
+extends = http://build.pythonpackages.com/buildout/apache/2.2.x
 EOF
 bin/buildout
 bin/supervisord -e debug -n
