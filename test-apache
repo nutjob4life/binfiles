@@ -1,13 +1,13 @@
 #!/bin/sh
 
 mkdir $1
-virtualenv-2.6 $1
+virtualenv-2.7 $1
 cd $1
-bin/easy_install zc.buildout
+bin/pip install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://x.aclark.net/apache/2.2.x/buildout.cfg
+extends = http://build.pythonpackages.com/buildout/apache/2.2.x/buildout.cfg
 EOF
 bin/buildout
 bin/supervisord -e debug -n
