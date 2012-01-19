@@ -10,4 +10,4 @@ cat << EOF > buildout.cfg
 extends = http://build.pythonpackages.com/buildout/plone/4.2.x
 EOF
 bin/buildout
-bin/paster serve plone.ini
+bin/paster serve development.ini
