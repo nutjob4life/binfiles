@@ -1,8 +1,7 @@
 #!/bin/sh
 
-mkdir $1
-virtualenv-2.7 $1
-cd $1
+pushd `tmp`
+virtualenv-2.7 .
 bin/pip install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
@@ -10,4 +9,4 @@ cat << EOF > buildout.cfg
 extends = http://build.pythonpackages.com/buildout/plone/4.2.x
 EOF
 bin/buildout
-bin/paster serve development.ini
+bin/plone fg
