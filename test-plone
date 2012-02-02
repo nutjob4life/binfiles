@@ -1,6 +1,7 @@
 #!/bin/sh
 
-pushd `tmp`
+mkdir $1
+cd $1
 virtualenv-2.7 .
 bin/pip install zc.buildout
 bin/buildout init
