@@ -1,6 +1,8 @@
 #!/bin/sh
-
-mkdir $1
+if [ -d $1]
+then
+    mkdir $1
+fi
 cd $1
 virtualenv-2.7 .
 bin/pip install zc.buildout
@@ -10,4 +12,9 @@ cat << EOF > buildout.cfg
 extends = http://build.pythonpackages.com/buildout/plone/4.2.x-dev
 EOF
 bin/buildout
+bin/plone start
+sleep 4
+echo "Adding Plone site..."
+curl -d form.submitted:boolean="True" http://admin:admin@localhost:8080/@@plone-addsite\?site_id=Plone
+bin/plone stop
 bin/plone fg
