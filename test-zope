@@ -7,6 +7,6 @@ bin/easy_install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://x.aclark.net/zope2/2.13.x/develop.cfg
+extends = http://pythonpackages.com/buildout/zope2/2.13.x
 EOF
 bin/buildout

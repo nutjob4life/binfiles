@@ -7,7 +7,7 @@ bin/easy_install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://dist.aclark.net/build/django/1.3.x/buildout.cfg
+extends = http://pythonpackages.com/buildout/django/1.4.x
 EOF
 bin/buildout
 bin/django runserver
