@@ -17,9 +17,9 @@ cat << EOF > buildout.cfg
 extends = http://pythonpackages.com/buildout/plone/4.2.x-dev
 EOF
 bin/buildout
-bin/plone start
-sleep 4
-echo "Adding Plone site..."
-curl -d form.submitted:boolean="True" http://admin:admin@localhost:8080/@@plone-addsite\?site_id=Plone
-bin/plone stop
+#bin/plone start
+#sleep 4
+#echo "Adding Plone site..."
+#curl -d form.submitted:boolean="True" http://admin:admin@localhost:8080/@@plone-addsite\?site_id=Plone
+#bin/plone stop
 bin/plone fg
