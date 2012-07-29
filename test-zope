@@ -1,12 +1,21 @@
 #!/bin/sh
 
-mkdir $1
-virtualenv-2.6 $1
+if ! [ -n "$1" ]
+then
+    echo "Usage:\n\n$0 <dir>\n"
+    exit 1
+fi
+if ! [ -d $1 ]
+then
+    mkdir $1
+fi
 cd $1
-bin/easy_install zc.buildout
+virtualenv-2.7 .
+bin/pip install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://pythonpackages.com/buildout/zope2/2.13.x
+extends = http://pythonpackages.com/buildout/zope2/2.13.x-dev
 EOF
 bin/buildout
+bin/zope2 fg
