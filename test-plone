@@ -14,7 +14,7 @@ bin/pip install zc.buildout
 bin/buildout init
 cat << EOF > buildout.cfg
 [buildout]
-extends = http://pythonpackages.com/buildout/plone/4.3.x
+extends = http://pythonpackages.com/buildout/plone/4.3.x-dev
 EOF
 bin/buildout
 #bin/plone start
