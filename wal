@@ -12,6 +12,9 @@
 # 7. encrypted file can be specified by -c option, by PASSWD_LIST
 #    envariable, or in ~/.walletrc
 
+
+GPG=gpg2
+
 if [ -f ~/.walletrc ]; then
 . ~/.walletrc
 fi
@@ -44,7 +47,7 @@ echo "$PASSWD_LIST doesn't exist--attempting to create..."
 echo "(you'll need to give gpg a master password in a moment)"
 mkdir -p $( dirname ${PASSWD_LIST} )
 TEMPFILE=$( mktemp /tmp/wallet.XXXXXX )
-gpg -c -o ${PASSWD_LIST} ${TEMPFILE}
+$GPG -c -o ${PASSWD_LIST} ${TEMPFILE}
 rm -f ${TEMPFILE}
 EDIT_PWFILE=1
 fi
@@ -66,7 +69,7 @@ esac
 
 # if we're not editing the file, just display it and quit
 if [ $EDIT_PWFILE -eq 0 ]; then
-echo $PASSWORD | gpg --decrypt --passphrase-fd 0 $PASSWD_LIST | less
+echo $PASSWORD | $GPG --decrypt --passphrase-fd 0 $PASSWD_LIST | less
 clear
 exit
 fi
@@ -75,7 +78,7 @@ TMPDIR=$( mktemp -d /tmp/wallet.XXXXXX )
 chmod 700 ${TMPDIR}
 PASSWD_LIST_UNENCRYPTED=${TMPDIR}/wallet
 # decrypt the password list
-echo $PASSWORD | gpg -o $PASSWD_LIST_UNENCRYPTED --passphrase-fd 0 \
+echo $PASSWORD | $GPG -o $PASSWD_LIST_UNENCRYPTED --passphrase-fd 0 \
 $PASSWD_LIST &> /dev/null
 RETVAL=$?
 
@@ -85,7 +88,7 @@ case $RETVAL in
 0)
   mv $PASSWD_LIST ${PASSWD_LIST}.bak
   ${VISUAL} $PASSWD_LIST_UNENCRYPTED 2> /dev/null;
-  echo $PASSWORD | gpg -c -o $PASSWD_LIST --passphrase-fd 0 \
+  echo $PASSWORD | $GPG -c -o $PASSWD_LIST --passphrase-fd 0 \
       $PASSWD_LIST_UNENCRYPTED &> /dev/null
   CRYPT_RETVAL=$?
   if [ $CRYPT_RETVAL -eq 0 ]; then
