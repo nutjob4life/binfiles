@@ -1,4 +1,0 @@
-#!/bin/sh
-cd ~/Dotfiles
-git commit -a -m "Save settings"
-git push
