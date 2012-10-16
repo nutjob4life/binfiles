@@ -2,7 +2,7 @@
 
 if ! [ -n "$1" ]
 then
-    echo "Usage:\n\n$0 <dir>\n"
+    echo "Usage:\n\n$0 <dir>\n" 1>&2
     exit 1
 fi
 if ! [ -d $1 ]
